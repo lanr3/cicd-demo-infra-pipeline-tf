@@ -1,14 +1,19 @@
 
+################################################################
+# CONFIGURE BACKEND
+################################################################
+
 terraform {
   required_version = ">=1.1.0" # version
 
-#   backend "s3" {
-#     bucket         = "3-tier-architecture-implementation"
-#     key            = "path/env/jenkins-infra-deployment-of-terraform"
-#     region         = "us-east-1"
-#     dynamodb_table = "terraform-lock"
-#     encrypt        = true
-#   }
+  backend "s3" {
+    bucket         = "cicd-pipeline-proj-bucket"
+    key            = "path/env/nana-cicd-demo-pipeline.tf"
+    region         = "us-east-1"
+    # dynamodb_table = "terraform-lock"
+    # encrypt        = true
+  }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -16,7 +21,6 @@ terraform {
     }
   }
 }
-
 
 ################################################################
 # PROVIDER BLOCK
@@ -80,6 +84,15 @@ resource "aws_instance" "sonarqube-server" {
 
   tags = {
     Name = "sonarqube-server"
+  }
+}
+
+resource "aws_ecr_repository" "this" {
+  name                 = "${var.component_name}-kojitecjs-webapp"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
   }
 }
 
